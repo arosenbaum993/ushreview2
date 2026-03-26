@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Georgia Milestones U.S. History Practice Simulation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,400&display=swap');
+
+  :root {
+    --bg: #f5f0e8;
+    --card: #ffffff;
+    --ink: #1a1208;
+    --muted: #6b5e45;
+    --line: #ddd6c8;
+    --navy: #1b2d5e;
+    --navy2: #2f4d9e;
+    --gold: #b8860b;
+    --gold-light: #f0e4b8;
+    --red: #8b1a1a;
+    --green: #1a4a2e;
+    --shadow: 0 4px 24px rgba(27,45,94,.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Source Serif 4', Georgia, serif;
+    background: var(--bg);
+    background-image:
+      radial-gradient(ellipse at 10% 20%, rgba(184,134,11,0.07) 0%, transparent 50%),
+      radial-gradient(ellipse at 90% 80%, rgba(27,45,94,0.07) 0%, transparent 50%);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  .app { max-width: 1120px; margin: 0 auto; padding: 24px 20px; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+  }
+
+  .hidden { display: none !important; }
+
+  /* ── GATE SCREEN ── */
+  .gate-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .gate {
+    width: 100%;
+    max-width: 480px;
+    padding: 44px 40px;
+    text-align: center;
+    border-top: 5px solid var(--navy);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .gate::before {
+    content: '★';
+    position: absolute;
+    font-size: 200px;
+    color: rgba(184,134,11,0.04);
+    top: -30px; left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .gate-badge {
+    display: inline-block;
+    background: var(--navy);
+    color: #d4af37;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 2px;
+    margin-bottom: 20px;
+  }
+
+  .gate h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 2rem;
+    color: var(--navy);
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+
+  .gate p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-bottom: 30px;
+    font-style: italic;
+  }
+
+  .gate-divider {
+    border: none;
+    border-top: 1px solid var(--line);
+    margin: 24px 0;
+  }
+
+  .field-label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    margin-bottom: 6px;
+    margin-top: 14px;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 6px;
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 1rem;
+    color: var(--ink);
+    background: #faf8f4;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+
+  input[type="text"]:focus {
+    border-color: var(--navy);
+    background: white;
+  }
+
+  .btn-primary {
+    display: block;
+    width: 100%;
+    margin-top: 22px;
+    padding: 14px;
+    background: var(--navy);
+    color: #d4af37;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  .btn-primary:hover { background: var(--navy2); }
+  .btn-primary:active { transform: scale(0.99); }
+
+  .meta-row {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 18px;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+
+  .meta-row span { display: flex; align-items: center; gap: 5px; }
+
+  /* ── TEST SCREEN ── */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 22px;
+    margin-bottom: 20px;
+    border-left: 4px solid var(--navy);
+  }
+
+  .student-info { line-height: 1.3; }
+  .student-name { font-family: 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 1.05rem; color: var(--navy); }
+  .student-period { font-size: 0.85rem; color: var(--muted); }
+
+  .timer-wrap { text-align: right; }
+  .timer-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); }
+  .timer {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--navy);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+    transition: color 0.4s;
+  }
+  .timer.urgent { color: var(--red); }
+
+  .layout { display: grid; grid-template-columns: 220px 1fr; gap: 18px; align-items: start; }
+
+  /* Nav Panel */
+  .nav-panel { padding: 18px; }
+  .nav-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .nav-legend {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-bottom: 14px;
+    line-height: 1.7;
+  }
+
+  .legend-dot {
+    display: inline-block;
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+
+  .side-nav { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+
+  .nav-btn {
+    aspect-ratio: 1;
+    border: 1.5px solid var(--line);
+    border-radius: 5px;
+    background: white;
+    cursor: pointer;
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ink);
+    transition: all 0.15s;
+  }
+
+  .nav-btn:hover { border-color: var(--navy2); background: #f0f4ff; }
+  .nav-btn.active { background: var(--navy); color: #d4af37; border-color: var(--navy); }
+  .nav-btn.answered { background: var(--gold-light); border-color: var(--gold); color: var(--ink); }
+  .nav-btn.active.answered { background: var(--navy); color: #d4af37; border-color: var(--navy); }
+
+  /* Question Panel */
+  .question-panel { padding: 28px; }
+
+  .q-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .q-number {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    border-right: 1px solid var(--line);
+    padding-right: 12px;
+  }
+
+  .q-prompt {
+    font-size: 1.12rem;
+    line-height: 1.6;
+    color: var(--ink);
+    font-weight: 400;
+    flex: 1;
+  }
+
+  .q-prompt strong { font-weight: 600; }
+
+  .choices { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
+
+  .choice {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.18s;
+    background: white;
+  }
+
+  .choice:hover { border-color: var(--navy2); background: #f8f9ff; }
+
+  .choice.selected {
+    border-color: var(--navy);
+    background: #eef2ff;
+    box-shadow: inset 3px 0 0 var(--navy);
+  }
+
+  .choice-letter {
+    flex-shrink: 0;
+    width: 26px; height: 26px;
+    border: 1.5px solid var(--line);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--muted);
+    transition: all 0.18s;
+  }
+
+  .choice.selected .choice-letter {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: #d4af37;
+  }
+
+  .choice-text { font-size: 0.97rem; line-height: 1.5; padding-top: 2px; }
+
+  .controls {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    align-items: center;
+  }
+
+  .progress-bar-wrap {
+    flex: 1;
+    margin: 0 20px;
+    background: var(--line);
+    border-radius: 99px;
+    height: 6px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: var(--navy);
+    border-radius: 99px;
+    transition: width 0.3s;
+  }
+
+  .btn-nav {
+    padding: 10px 22px;
+    border-radius: 6px;
+    border: 1.5px solid var(--line);
+    background: white;
+    cursor: pointer;
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--ink);
+    transition: all 0.15s;
+  }
+
+  .btn-nav:hover { border-color: var(--navy); color: var(--navy); }
+
+  .btn-nav.primary {
+    background: var(--navy);
+    color: #d4af37;
+    border-color: var(--navy);
+  }
+
+  .btn-nav.primary:hover { background: var(--navy2); border-color: var(--navy2); }
+
+  /* ── RESULT SCREEN ── */
+  .result-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .result-card {
+    width: 100%;
+    max-width: 520px;
+    padding: 50px 44px;
+    text-align: center;
+    border-top: 5px solid var(--gold);
+  }
+
+  .result-emblem {
+    font-size: 3rem;
+    margin-bottom: 16px;
+  }
+
+  .result-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.8rem;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+
+  .result-name {
+    font-style: italic;
+    color: var(--muted);
+    font-size: 1rem;
+    margin-bottom: 32px;
+  }
+
+  .score-circle {
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    border: 5px solid var(--navy);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 30px;
+    background: white;
+    box-shadow: 0 0 0 10px rgba(27,45,94,0.06);
+  }
+
+  .score-number {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 2.6rem;
+    font-weight: 900;
+    color: var(--navy);
+    line-height: 1;
+  }
+
+  .score-total {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .score-pct {
+    font-size: 1.5rem;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+
+  .score-msg {
+    font-size: 0.95rem;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 28px;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 700px) {
+    .layout { grid-template-columns: 1fr; }
+    .nav-panel { order: 2; }
+    .question-panel { order: 1; }
+    .gate { padding: 32px 22px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- GATE SCREEN -->
+<div id="gateScreen" class="gate-wrap">
+  <div class="card gate">
+    <div class="gate-badge">Georgia Milestones EOC</div>
+    <h1>U.S. History<br>Practice Simulation</h1>
+    <p>50-Minute Timed Assessment &nbsp;·&nbsp; Multiple Choice</p>
+    <hr class="gate-divider">
+    <label class="field-label" for="studentName">Full Name</label>
+    <input type="text" id="studentName" placeholder="First Last" autocomplete="name">
+    <label class="field-label" for="studentPeriod">Class Period</label>
+    <input type="text" id="studentPeriod" placeholder="e.g. Period 3">
+    <button class="btn-primary" id="beginBtn">Begin Simulation →</button>
+    <div class="meta-row">
+      <span>📋 50 Questions</span>
+      <span>⏱ 50 Minutes</span>
+      <span>📊 Auto-Scored</span>
+    </div>
+  </div>
+</div>
+
+<!-- TEST SCREEN -->
+<div id="testScreen" class="app hidden">
+
+  <div class="card topbar">
+    <div class="student-info">
+      <div class="student-name" id="displayName"></div>
+      <div class="student-period" id="displayPeriod"></div>
+    </div>
+    <div class="timer-wrap">
+      <div class="timer-label">Time Remaining</div>
+      <div class="timer" id="timerDisplay">50:00</div>
+    </div>
+  </div>
+
+  <div class="layout">
+
+    <!-- Nav -->
+    <div class="card nav-panel">
+      <div class="nav-title">Question Navigator</div>
+      <div class="nav-legend">
+        <span class="legend-dot" style="background:var(--gold-light); border:1px solid var(--gold);"></span> Answered<br>
+        <span class="legend-dot" style="background:var(--navy);"></span> Current<br>
+        <span class="legend-dot" style="background:white; border:1px solid var(--line);"></span> Unanswered
+      </div>
+      <div class="side-nav" id="questionNav"></div>
+    </div>
+
+    <!-- Question -->
+    <div class="card question-panel">
+      <div id="questionContainer"></div>
+      <div class="controls">
+        <button class="btn-nav" id="prevBtn">← Prev</button>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <button class="btn-nav primary" id="nextBtn">Next →</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- RESULT SCREEN -->
+<div id="resultScreen" class="result-wrap hidden">
+  <div class="card result-card">
+    <div class="result-emblem">🏛️</div>
+    <div class="result-title">Simulation Complete</div>
+    <div class="result-name" id="resultName"></div>
+    <div class="score-circle">
+      <div class="score-number" id="scoreNum"></div>
+      <div class="score-total" id="scoreTotal"></div>
+    </div>
+    <div class="score-pct" id="scorePct"></div>
+    <div class="score-msg" id="scoreMsg"></div>
+    <div id="submitStatus" style="font-size:0.88rem; margin-bottom:18px; min-height:1.2em;"></div>
+    <button class="btn-primary" onclick="location.reload()">Restart Simulation</button>
+  </div>
+</div>
+
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwEc-uL_Tbc8UeENOEB9bu8xVadkq4iRNpn0PRaBbgN6XPKCRW7VuOYzUNMP_oIGuG31g/exec";
+
+const QUESTIONS = [
+  { id: 1,  prompt: "Which development most directly increased the demand for enslaved labor in colonial Virginia?", choices: ["The founding of the House of Burgesses","The expansion of tobacco cultivation","The establishment of the colony of Rhode Island","The end of the French and Indian War"], answer: 1 },
+  { id: 2,  prompt: "One important effect of the Great Awakening was that it…", choices: ["Strengthened the authority of established churches","Encouraged people to challenge traditional authority","Ended the conflict between colonists and Native Americans","Led to the immediate abolition of slavery"], answer: 1 },
+  { id: 3,  prompt: "The Middle Passage was a part of the Trans-Atlantic trade route that carried…", choices: ["Manufactured goods to Europe","Raw materials to the colonies","Enslaved Africans to the Americas","Rum to West Africa"], answer: 2 },
+  { id: 4,  prompt: "Which Enlightenment idea most directly influenced the Declaration of Independence?", choices: ["Governments derive their power from divine right","People have natural rights that governments must protect","Economic growth depends on free trade","Citizens owe absolute loyalty to their monarch"], answer: 1 },
+  { id: 5,  prompt: "The Articles of Confederation were considered weak mainly because…", choices: ["They gave the president too much power","Congress had no power to levy taxes or regulate commerce","They allowed slavery to expand into new territories","States were forbidden from making their own laws"], answer: 1 },
+  { id: 6,  prompt: "How did the Constitutional Convention resolve the disagreement between large and small states over representation?", choices: ["By creating an Electoral College","By allowing each state to set its own representation","Through the Great Compromise, creating a bicameral legislature","By giving all legislative power to the Senate"], answer: 2 },
+  { id: 7,  prompt: "Which of the following best describes the purpose of The Federalist Papers?", choices: ["To argue for a second American Revolution","To ratify the Bill of Rights","To persuade states to ratify the U.S. Constitution","To establish a national bank"], answer: 2 },
+  { id: 8,  prompt: "The Louisiana Purchase of 1803 was significant mainly because it…", choices: ["Ended conflict with France permanently","Doubled the size of the United States","Established the right of westward expansion by treaty","Led directly to the War of 1812"], answer: 1 },
+  { id: 9,  prompt: "Manifest Destiny was the belief that…", choices: ["The U.S. had a duty to spread democracy worldwide","American expansion across the continent was inevitable and justified","Free market capitalism would naturally spread west","Native Americans should be assimilated into American culture"], answer: 1 },
+  { id: 10, prompt: "Which factor most directly contributed to the outbreak of the Civil War?", choices: ["Disagreements over tariff policy alone","The issue of slavery's expansion into new territories","The assassination of a major political leader","A foreign invasion of Southern states"], answer: 1 },
+  { id: 11, prompt: "The Emancipation Proclamation (1863) declared that…", choices: ["Slavery was abolished throughout the entire United States","All enslaved people in Confederate states in rebellion were free","African Americans were granted full citizenship rights","The Union would accept Confederate surrender terms"], answer: 1 },
+  { id: 12, prompt: "What was the primary goal of Reconstruction following the Civil War?", choices: ["To punish Confederate leaders with prison sentences","To reintegrate Southern states and address the status of freedmen","To expand U.S. territory into the Caribbean","To repay war debts to European nations"], answer: 1 },
+  { id: 13, prompt: "The Transcontinental Railroad, completed in 1869, most directly…", choices: ["Led to the end of the cattle drive era","Connected the Atlantic and Pacific coasts, boosting economic growth","Was built entirely by Chinese immigrants","Caused the collapse of Southern agriculture"], answer: 1 },
+  { id: 14, prompt: "Which term describes the rapid growth of large corporations and trusts in the late 19th century that stifled competition?", choices: ["Progressivism","Laissez-faire capitalism","Monopolization","Populism"], answer: 2 },
+  { id: 15, prompt: "The Populist Party of the 1890s primarily represented…", choices: ["Urban factory workers","Southern plantation owners","Farmers struggling with debt and railroad abuses","Northern industrialists"], answer: 2 },
+  { id: 16, prompt: "The Spanish-American War of 1898 resulted in…", choices: ["Spain regaining control of Cuba","The U.S. acquiring territories including Puerto Rico and the Philippines","A formal alliance between the U.S. and Britain","The withdrawal of the U.S. from international affairs"], answer: 1 },
+  { id: 17, prompt: "Which amendment to the Constitution granted women the right to vote?", choices: ["15th Amendment","17th Amendment","18th Amendment","19th Amendment"], answer: 3 },
+  { id: 18, prompt: "The Progressive Era (1890–1920) was primarily focused on…", choices: ["Expanding the power of large corporations","Reforming the abuses of industrialization and government corruption","Promoting isolationism in foreign policy","Reducing the size of the federal government"], answer: 1 },
+  { id: 19, prompt: "Which of the following best explains why the United States entered World War I in 1917?", choices: ["The U.S. was directly attacked by Germany","Germany's unrestricted submarine warfare threatened American lives and ships","Britain requested formal military alliance","France surrendered to Germany"], answer: 1 },
+  { id: 20, prompt: "President Wilson's Fourteen Points were intended to…", choices: ["Establish harsh punishments for Germany","Create a lasting peace and prevent future wars after WWI","Divide Europe among the Allied powers","Expand American overseas territories"], answer: 1 },
+  { id: 21, prompt: "The Great Migration (1910–1970) refers to…", choices: ["European immigrants arriving at Ellis Island","African Americans moving from the South to Northern cities","The movement of settlers into the Great Plains","American soldiers returning from World War I"], answer: 1 },
+  { id: 22, prompt: "The Harlem Renaissance was a cultural movement that…", choices: ["Promoted African American art, literature, and music","Encouraged African Americans to return to Africa","Focused on labor union organizing in Northern cities","Opposed the Great Migration"], answer: 0 },
+  { id: 23, prompt: "Which event most directly triggered the Great Depression?", choices: ["The passage of the Smoot-Hawley Tariff","The stock market crash of 1929","The end of World War I","The Dust Bowl drought"], answer: 1 },
+  { id: 24, prompt: "President Franklin Roosevelt's New Deal was designed to…", choices: ["End World War II","Provide relief, recovery, and reform during the Great Depression","Expand American territory overseas","Reduce the national debt"], answer: 1 },
+  { id: 25, prompt: "The attack on Pearl Harbor on December 7, 1941 led directly to…", choices: ["The U.S. declaring war on Germany only","The U.S. entering World War II","The fall of France to Nazi Germany","Japan surrendering to the Allies"], answer: 1 },
+  { id: 26, prompt: "The internment of Japanese Americans during World War II was primarily justified by…", choices: ["Proof of widespread Japanese American disloyalty","Fear and racial prejudice following Pearl Harbor","Orders from the Japanese government","Legal proceedings in federal courts"], answer: 1 },
+  { id: 27, prompt: "The Marshall Plan (1948) was a U.S. effort to…", choices: ["Rebuild war-torn European economies and prevent the spread of communism","Establish military bases in Asia","Create the United Nations","Force Germany to pay war reparations"], answer: 0 },
+  { id: 28, prompt: "The policy of containment during the Cold War referred to…", choices: ["Preventing the expansion of Soviet communism beyond its current borders","Eliminating nuclear weapons worldwide","Containing economic inflation at home","Isolating the United States from foreign alliances"], answer: 0 },
+  { id: 29, prompt: "The Korean War (1950–1953) ended with…", choices: ["A decisive U.S. victory","Korea remaining divided near the 38th parallel","The U.S. withdrawing without a formal agreement","China defeating South Korea"], answer: 1 },
+  { id: 30, prompt: "Brown v. Board of Education (1954) ruled that…", choices: ["Affirmative action in college admissions was constitutional","Segregated public schools were unconstitutional","The Civil Rights Act of 1964 was valid","Poll taxes were illegal"], answer: 1 },
+  { id: 31, prompt: "The Montgomery Bus Boycott (1955–1956) was a civil rights protest against…", choices: ["School segregation","Racial segregation on city buses","Discriminatory voting laws","Employment discrimination in factories"], answer: 1 },
+  { id: 32, prompt: "President Eisenhower's decision to send federal troops to Little Rock, Arkansas in 1957 was in response to…", choices: ["Labor strikes at a federal factory","Resistance to school desegregation","Anti-Vietnam War protests","Civil rights marches on Washington"], answer: 1 },
+  { id: 33, prompt: "The Cuban Missile Crisis (1962) was resolved when…", choices: ["The U.S. invaded Cuba to remove the missiles","The Soviet Union agreed to remove missiles from Cuba in exchange for U.S. concessions","Cuba dismantled the missiles voluntarily","The United Nations deployed peacekeepers to Cuba"], answer: 1 },
+  { id: 34, prompt: "The Civil Rights Act of 1964 primarily…", choices: ["Granted voting rights to African Americans","Prohibited discrimination based on race, color, religion, sex, or national origin","Ended the Vietnam War","Established affirmative action programs"], answer: 1 },
+  { id: 35, prompt: "The Voting Rights Act of 1965 was significant because it…", choices: ["Gave women the right to vote","Eliminated discriminatory voting practices like literacy tests","Lowered the voting age to 18","Established the Electoral College"], answer: 1 },
+  { id: 36, prompt: "Which of the following best describes the domino theory as it related to U.S. involvement in Vietnam?", choices: ["If one nation in a region fell to communism, neighboring nations would follow","Communist nations would eventually collapse on their own","Military alliances would protect Southeast Asia from invasion","Economic aid could stop the spread of communism"], answer: 0 },
+  { id: 37, prompt: "The Tet Offensive (1968) was significant mainly because it…", choices: ["Was a decisive military victory for the United States","Shocked the American public and eroded support for the Vietnam War","Led to immediate peace negotiations","Caused North Vietnam to surrender"], answer: 1 },
+  { id: 38, prompt: "Which event led directly to President Nixon's resignation in 1974?", choices: ["His failure to end the Vietnam War","The Watergate scandal, which revealed abuses of presidential power","The energy crisis of the early 1970s","Protests against the invasion of Cambodia"], answer: 1 },
+  { id: 39, prompt: "The fall of the Berlin Wall in 1989 symbolized…", choices: ["The beginning of the Cold War","The collapse of communist control in Eastern Europe","Germany's reunification with the Soviet Union","The start of the Persian Gulf War"], answer: 1 },
+  { id: 40, prompt: "The Persian Gulf War (1990–1991) was primarily triggered by…", choices: ["Iraq's invasion of Kuwait","A terrorist attack on U.S. soil","The collapse of the Soviet Union","An oil embargo by OPEC"], answer: 0 },
+  { id: 41, prompt: "Which Supreme Court case established the principle of judicial review?", choices: ["McCulloch v. Maryland","Marbury v. Madison","Dred Scott v. Sandford","Plessy v. Ferguson"], answer: 1 },
+  { id: 42, prompt: "The three-fifths compromise in the U.S. Constitution counted enslaved people as three-fifths of a person for the purpose of…", choices: ["Determining taxes only","Calculating representation in Congress","Setting property values in Southern states","Determining eligibility to vote"], answer: 1 },
+  { id: 43, prompt: "Which amendment abolished slavery in the United States?", choices: ["13th Amendment","14th Amendment","15th Amendment","16th Amendment"], answer: 0 },
+  { id: 44, prompt: "The 14th Amendment (1868) was significant primarily because it…", choices: ["Abolished slavery","Granted citizenship and equal protection under the law to all persons born in the U.S.","Gave African American men the right to vote","Prohibited poll taxes"], answer: 1 },
+  { id: 45, prompt: "Plessy v. Ferguson (1896) upheld the constitutionality of…", choices: ["Slavery","Segregation under the 'separate but equal' doctrine","Literacy tests for voting","Denial of women's suffrage"], answer: 1 },
+  { id: 46, prompt: "Which statement best describes the impact of industrialization on American society in the late 19th century?", choices: ["It reduced immigration from Europe","It led to the growth of cities and a shift from farming to factory work","It eliminated poverty in urban areas","It strengthened the political power of farmers"], answer: 1 },
+  { id: 47, prompt: "The Sherman Antitrust Act (1890) was intended to…", choices: ["Protect workers' rights to form unions","Break up monopolies and restore competition","Regulate railroads and lower freight costs","Tax large corporations at higher rates"], answer: 1 },
+  { id: 48, prompt: "What was the primary cause of increased immigration to the United States between 1880 and 1920?", choices: ["U.S. government recruitment programs","Political persecution, economic hardship, and famine in Europe and Asia","Decline in birth rates in the United States","End of slavery creating labor shortages"], answer: 1 },
+  { id: 49, prompt: "How did the U.S. government's relationship with Native Americans change as a result of westward expansion in the 19th century?", choices: ["Native Americans were gradually granted full citizenship rights","Native Americans were forcibly removed from their lands and placed on reservations","The government signed lasting treaties that protected Native American territory","Native American nations formed alliances with Mexico against the U.S."], answer: 1 },
+  { id: 50, prompt: "The Cold War was primarily a conflict between…", choices: ["Democracy and fascism","The United States and the Soviet Union over ideological and geopolitical power","NATO and the United Nations","The U.S. and China over trade and territory"], answer: 1 }
+];
+
+const state = {
+  currentIdx: 0,
+  answers: {},
+  timeLeft: 3000,
+  timerInterval: null,
+  studentName: '',
+};
+
+const gate       = document.getElementById('gateScreen');
+const testScreen = document.getElementById('testScreen');
+const resultScreen = document.getElementById('resultScreen');
+
+document.getElementById('beginBtn').addEventListener('click', () => {
+  const name   = document.getElementById('studentName').value.trim();
+  const period = document.getElementById('studentPeriod').value.trim();
+  if (!name || !period) return alert('Please enter your full name and class period.');
+  state.studentName = name;
+  document.getElementById('displayName').textContent   = name;
+  document.getElementById('displayPeriod').textContent = 'Period: ' + period;
+  gate.classList.add('hidden');
+  testScreen.classList.remove('hidden');
+  startTimer();
+  renderNav();
+  renderQuestion();
+});
+
+function renderNav() {
+  const nav = document.getElementById('questionNav');
+  nav.innerHTML = '';
+  QUESTIONS.forEach((q, i) => {
+    const btn = document.createElement('button');
+    const isActive   = state.currentIdx === i;
+    const isAnswered = state.answers[i] !== undefined;
+    btn.className = 'nav-btn' + (isActive ? ' active' : '') + (isAnswered ? ' answered' : '');
+    btn.textContent = q.id;
+    btn.title = `Question ${q.id}`;
+    btn.onclick = () => { state.currentIdx = i; renderNav(); renderQuestion(); };
+    nav.appendChild(btn);
+  });
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[state.currentIdx];
+  const answered = state.answers[state.currentIdx];
+  document.getElementById('questionContainer').innerHTML = `
+    <div class="q-header">
+      <span class="q-number">Question ${q.id} of ${QUESTIONS.length}</span>
+    </div>
+    <div class="q-prompt">${q.prompt}</div>
+    <div class="choices">
+      ${q.choices.map((c, i) => `
+        <div class="choice${answered === i ? ' selected' : ''}" onclick="selectAnswer(${i})">
+          <div class="choice-letter">${String.fromCharCode(65 + i)}</div>
+          <div class="choice-text">${c}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  // Progress bar
+  const answered_count = Object.keys(state.answers).length;
+  document.getElementById('progressBar').style.width = `${(answered_count / QUESTIONS.length) * 100}%`;
+
+  // Last question: change Next to Submit
+  const nextBtn = document.getElementById('nextBtn');
+  if (state.currentIdx === QUESTIONS.length - 1) {
+    nextBtn.textContent = 'Submit →';
+  } else {
+    nextBtn.textContent = 'Next →';
+  }
+}
+
+window.selectAnswer = (choiceIdx) => {
+  state.answers[state.currentIdx] = choiceIdx;
+  renderNav();
+  renderQuestion();
+};
+
+document.getElementById('nextBtn').addEventListener('click', () => {
+  if (state.currentIdx < QUESTIONS.length - 1) {
+    state.currentIdx++;
+  } else {
+    const unanswered = QUESTIONS.length - Object.keys(state.answers).length;
+    if (unanswered > 0) {
+      if (!confirm(`You have ${unanswered} unanswered question(s). Submit anyway?`)) return;
+    }
+    finishTest();
+    return;
+  }
+  renderNav();
+  renderQuestion();
+});
+
+document.getElementById('prevBtn').addEventListener('click', () => {
+  if (state.currentIdx > 0) {
+    state.currentIdx--;
+    renderNav();
+    renderQuestion();
+  }
+});
+
+function startTimer() {
+  const display = document.getElementById('timerDisplay');
+  state.timerInterval = setInterval(() => {
+    state.timeLeft--;
+    const m = Math.floor(state.timeLeft / 60);
+    const s = state.timeLeft % 60;
+    display.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+    if (state.timeLeft <= 300) display.classList.add('urgent');
+    if (state.timeLeft <= 0) {
+      clearInterval(state.timerInterval);
+      finishTest();
+    }
+  }, 1000);
+}
+
+function formatTimeUsed(secondsLeft) {
+  const used = 3000 - secondsLeft;
+  const m = Math.floor(used / 60);
+  const s = used % 60;
+  return `${m}:${s < 10 ? '0' : ''}${s}`;
+}
+
+function finishTest() {
+  clearInterval(state.timerInterval);
+  testScreen.classList.add('hidden');
+  resultScreen.classList.remove('hidden');
+
+  let correct = 0;
+  QUESTIONS.forEach((q, i) => {
+    if (state.answers[i] === q.answer) correct++;
+  });
+
+  const pct = Math.round((correct / QUESTIONS.length) * 100);
+  let msg = '';
+  if (pct >= 90)      msg = 'Outstanding performance — you are well-prepared for the Milestones EOC.';
+  else if (pct >= 80) msg = 'Strong work. A bit more review of missed topics will sharpen your readiness.';
+  else if (pct >= 70) msg = 'Solid foundation. Focus your review on the questions you missed.';
+  else if (pct >= 60) msg = 'Keep going — targeted review of key content areas will help you grow.';
+  else                msg = 'More practice is needed. Revisit your notes and re-take the simulation.';
+
+  document.getElementById('resultName').textContent = state.studentName;
+  document.getElementById('scoreNum').textContent   = correct;
+  document.getElementById('scoreTotal').textContent = `out of ${QUESTIONS.length}`;
+  document.getElementById('scorePct').textContent   = `${pct}%`;
+  document.getElementById('scoreMsg').textContent   = msg;
+
+  // Submit to Google Sheet
+  const submitStatus = document.getElementById('submitStatus');
+  submitStatus.textContent  = '⏳ Submitting your results…';
+  submitStatus.style.color  = 'var(--muted)';
+
+  const payload = {
+    name:       state.studentName,
+    period:     document.getElementById('displayPeriod').textContent.replace('Period: ', ''),
+    score:      correct,
+    total:      QUESTIONS.length,
+    percentage: pct,
+    timeUsed:   formatTimeUsed(state.timeLeft)
+  };
+
+  fetch(SCRIPT_URL, {
+    method:  'POST',
+    mode:    'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(payload)
+  })
+  .then(() => {
+    submitStatus.textContent = '✅ Results submitted successfully.';
+    submitStatus.style.color = 'var(--green)';
+  })
+  .catch(() => {
+    submitStatus.textContent = '⚠️ Submission failed. Please notify your teacher.';
+    submitStatus.style.color = 'var(--red)';
+  });
+}
+</script>
+</body>
+</html>
